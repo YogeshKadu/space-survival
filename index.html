@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Document</title>
+    <!-- <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style> -->
+  </head>
+  <body>
+    <main class="w-full h-dvh bg-gray-700">
+      <div class="flex h-dvh flex-row justify-center">
+        <div class="player h-full flex-1 p-2">
+          <h3 class="font-sans font-medium text-[cyan] uppercase">Player 1</h3>
+          <div id="player1_icons_tray" class="flex flex-row gap-1 h-3">
+            <a href="https://www.flaticon.com/free-icons/heart" title="heart icons" target="_blank" class="h-full">
+              <img src="./assets/fullheart.png" alt="full heart" class="h-full">
+            </a>
+            <a href="https://www.flaticon.com/free-icons/heart" title="heart icons" target="_blank" class="h-full">
+              <img src="./assets/fullheart.png" alt="full heart" class="h-full">
+            </a>
+            <a href="https://www.flaticon.com/free-icons/heart" title="heart icons" target="_blank" class="h-full">
+              <img src="./assets/fullheart.png" alt="full heart" class="h-full">
+            </a>
+<!-- <a href="https://www.flaticon.com/free-icons/heart" title="heart icons">Heart icons created by Chanut - Flaticon</a> -->
+          </div>
+        </div>
+        <canvas id="canvas" class=""></canvas>
+        <div class="player h-full flex-1 p-2">
+          <h3>Player 1</h3>
+        </div>
+			</div>
+		</main>
+    <script type="module" src="./utils/initializeCanvas.js"></script>
+    <!-- <script type="module" src="./script.js"></script> -->
+    <script type="module" src="./index.js"></script>
+  </body>
+</html>
