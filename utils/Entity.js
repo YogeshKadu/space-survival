@@ -1,6 +1,7 @@
 import { UpdatePlayer1HartsUI } from "./initializeCanvas.js";
 import { keys } from "./input.js";
 import { generateRandomId, getAngle, getRadian, lerp } from "./utils.js";
+// import "./../assets/sounds/endgame/meme-de-creditos-finales.mp3"
 
 class Entity {
   constructor(x, y, angle, lerpSteering, acceleration, maxSteeringAngle) {
@@ -130,13 +131,18 @@ export class Player extends Entity {
   }
   decreaseLives() {
     this.lives -= 1;
+    if(this.lives == 1 && audioManager) {
+      audioManager?.play(audios.lastHeart);
+    }
     UpdatePlayer1HartsUI(this.lives);
     if (this.lives <= 0) {
       HandleGameOver();
       console.log("Player died");
+      audioManager?.play("endgame");
       isGamePause= true;
     } else {
       addExplosion(this.x, this.y);
+      audioManager?.play("hit");
     }
   }
 }
@@ -231,7 +237,6 @@ export class Enemy extends Entity {
   }
 }
 
-
 export class Explosion {
   constructor(x, y) {
     this.x = x;
@@ -277,5 +282,34 @@ export class Explosion {
 
   get finished() {
     return this.particles.length === 0;
+  }
+}
+
+const audios = {
+  lastHeart: "lastHeart",
+  hit:"hit",
+  endgame: "endgame"
+}
+export class AudioManager {
+  constructor() {
+    this.sounds = {
+      lastHeart: new Audio("./assets/sounds/lastheart/run-vine-sound-effect.mp3"),
+      hit: new Audio("./assets/sounds/hit/punch_u4LmMsr.mp3"),
+      endgame: new Audio("./assets/sounds/endgame/meme-de-creditos-finales.mp3")
+    };
+
+    Object.values(this.sounds).forEach(audio => {
+      audio.preload = "auto";
+      audio.load();
+    });
+  }
+
+  play(name) {
+    const audio = this.sounds[name];
+
+    if (!audio) return;
+
+    audio.currentTime = 0;
+    audio.play();
   }
 }

@@ -83,6 +83,7 @@ const UpdateEnemies = () => {
         if (Math.hypot(dx, dy) < e1.radius + e2.radius) {
           e1.destroyed = true;
           e2.destroyed = true;
+          audioManager?.play("hit");
           addExplosion(e1.x, e1.y);
         }
       }

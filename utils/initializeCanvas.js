@@ -1,3 +1,5 @@
+import { AudioManager } from "./Entity.js";
+
 window.canvas = document.getElementById("canvas");
 window.player1_tile = document.getElementById("player1_icons_tray");
 window.ctx = canvas.getContext("2d");
@@ -28,3 +30,5 @@ export const UpdatePlayer1HartsUI = (lives) => {
   }
 };
 // UpdatePlayer1Harts(2);
+
+window.audioManager = new AudioManager();
