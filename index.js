@@ -19,7 +19,7 @@ const StartGame = () => {
   ENEMIES = [];
   EXPLOSIONS = [];
   player1 = new Player(
-    width / 2, // x
+    width / 2 - 150, // x
     height / 2, // y
     270, // starting angle
     0.1, // lerpSteering
@@ -27,6 +27,18 @@ const StartGame = () => {
     3, // acceleration
     ctx, // context
     2.5, // steeringSpeed
+    1
+  );
+  player2 = new Player(
+    width / 2 + 150, // x
+    height / 2, // y
+    270, // starting angle
+    0.1, // lerpSteering
+    60, // maxSteeringAngle
+    3, // acceleration
+    ctx, // context
+    2.5, // steeringSpeed
+    2
   );
   spownEnemyInterval = setInterval(() => {
     AddEnemies();
@@ -54,6 +66,7 @@ const AddEnemies = () => {
         maxSteeringAngle,
         acceleration,
         player1,
+        player2,
         ctx,
       ),
     );
@@ -114,6 +127,11 @@ function animate(timestamp) {
       player1?.calculate();
       player1?.update();
       player1?.draw();
+    }
+    if (player2) {
+      player2?.calculate();
+      player2?.update();
+      player2?.draw();
     }
 
     UpdateEnemies();

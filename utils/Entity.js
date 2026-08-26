@@ -1,7 +1,6 @@
-import { UpdatePlayer1HartsUI } from "./initializeCanvas.js";
+import { UpdatePlayer1HartsUI, UpdatePlayer2HartsUI } from "./initializeCanvas.js";
 import { keys } from "./input.js";
 import { generateRandomId, getAngle, getRadian, lerp } from "./utils.js";
-// import "./../assets/sounds/endgame/meme-de-creditos-finales.mp3"
 
 class Entity {
   constructor(x, y, angle, lerpSteering, acceleration, maxSteeringAngle) {
@@ -9,7 +8,7 @@ class Entity {
     this.x = x;
     this.y = y;
     this.angle = angle;
-    this.maxSteeringAngle = maxSteeringAngle
+    this.maxSteeringAngle = maxSteeringAngle;
     this.maxSteeringRadial = getRadian(maxSteeringAngle);
     this.velocity = angle;
     this.lerpSteering = lerpSteering;
@@ -58,19 +57,30 @@ export class Player extends Entity {
     acceleration = 3,
     ctx = null,
     steeringSpeed = 2.5,
+    controller = 1, // 1 or 2
   ) {
     super(x, y, angle, lerpSteering, acceleration, maxSteeringAngle);
     this.ctx = ctx;
     this.radius = 10;
     this.steeringSpeed = steeringSpeed;
     this.lives = 3;
+    this.controller = controller;
   }
   calculate() {
-    if (keys["A"] || keys["a"] || keys["ArrowLeft"]) {
-      this.angle -= this.steeringSpeed;
-    }
-    if (keys["D"] || keys["d"] || keys["ArrowRight"]) {
-      this.angle += this.steeringSpeed;
+    if (this.controller == 1) {
+      if (keys["A"] || keys["a"]) {
+        this.angle -= this.steeringSpeed;
+      }
+      if (keys["D"] || keys["d"]) {
+        this.angle += this.steeringSpeed;
+      }
+    } else {
+      if (keys["ArrowLeft"]) {
+        this.angle -= this.steeringSpeed;
+      }
+      if (keys["ArrowRight"]) {
+        this.angle += this.steeringSpeed;
+      }
     }
 
     this.radian = getRadian(this.angle); // needed only to render rays
@@ -119,7 +129,9 @@ export class Player extends Entity {
     this.ctx.save();
     this.ctx.translate(this.x, this.y);
     this.ctx.rotate(this.velocityRadian);
-    this.ctx.fillStyle = "cyan"; //#00FF00
+    if (this.controller == 1)
+      this.ctx.fillStyle = "cyan"; //#00FF00
+    else this.ctx.fillStyle = "#00FF00";
     this.ctx.beginPath();
     this.ctx.moveTo(15, 0);
     this.ctx.lineTo(-10, -10);
@@ -131,15 +143,16 @@ export class Player extends Entity {
   }
   decreaseLives() {
     this.lives -= 1;
-    if(this.lives == 1 && audioManager) {
-      audioManager?.play(audios.lastHeart);
+    if (this.lives == 1 && audioManager) {
+      audioManager?.playAsync(audios.lastHeart);
     }
-    UpdatePlayer1HartsUI(this.lives);
+    if (this.controller == 1) UpdatePlayer1HartsUI(this.lives);
+    else UpdatePlayer2HartsUI(this.lives);
     if (this.lives <= 0) {
       HandleGameOver();
       console.log("Player died");
       audioManager?.play("endgame");
-      isGamePause= true;
+      isGamePause = true;
     } else {
       addExplosion(this.x, this.y);
       audioManager?.play("hit");
@@ -155,18 +168,36 @@ export class Enemy extends Entity {
     lerpSteering = 0.04,
     maxSteeringAngle = 40,
     acceleration = 4,
-    player = null,
+    // player = null,
+    player1 = null,
+    player2 = null,
     ctx = null,
   ) {
     super(x, y, angle, lerpSteering, acceleration, maxSteeringAngle);
     this.ctx = ctx;
     this.radius = 10;
-    this.player = player;
+    // this.playe = player;
+    this.player1 = player1;
+    this.player2 = player2;
     this.targetPlayer = null;
   }
   calculate() {
-    const dx = this.player.x - this.x;
-    const dy = this.player.y - this.y;
+    if (this.player2) {
+      const dist1 = Math.hypot(
+        this.player1.x - this.x,
+        this.player1.y - this.y,
+      );
+      const dist2 = Math.hypot(
+        this.player2.x - this.x,
+        this.player2.y - this.y,
+      );
+      this.targetPlayer = dist1 < dist2 ? this.player1 : this.player2;
+    } else {
+      this.targetPlayer = this.player1;
+    }
+
+    const dx = this.targetPlayer.x - this.x;
+    const dy = this.targetPlayer.y - this.y;
     this.radian = Math.atan2(dy, dx);
     this.angle = getAngle(this.radian);
   }
@@ -225,14 +256,14 @@ export class Enemy extends Entity {
     this.ctx.restore();
   }
   calculatePlayerCollusion() {
-    const dx = this.player.x - this.x;
-    const dy = this.player.y - this.y;
+    const dx = this.targetPlayer.x - this.x;
+    const dy = this.targetPlayer.y - this.y;
     // const distance = Math.sqrt(dx * dx + dy * dy);
-    // return distance <= this.player.radius + this.radius;
+    // return distance <= this.targetPlayer.radius + this.radius;
     const distance = Math.hypot(dx, dy);
-    if(distance < this.radius + this.player.radius) {
-      this.player.decreaseLives();
-      this.destroyed =true;
+    if (distance < this.radius + this.targetPlayer.radius) {
+      this.targetPlayer.decreaseLives();
+      this.destroyed = true;
     }
   }
 }
@@ -258,17 +289,17 @@ export class Explosion {
   }
 
   update() {
-    this.particles.forEach(p => {
+    this.particles.forEach((p) => {
       p.x += p.vx;
       p.y += p.vy;
       p.life--;
     });
 
-    this.particles = this.particles.filter(p => p.life > 0);
+    this.particles = this.particles.filter((p) => p.life > 0);
   }
 
   draw(ctx) {
-    this.particles.forEach(p => {
+    this.particles.forEach((p) => {
       ctx.globalAlpha = p.life / 30;
 
       ctx.beginPath();
@@ -287,29 +318,60 @@ export class Explosion {
 
 const audios = {
   lastHeart: "lastHeart",
-  hit:"hit",
-  endgame: "endgame"
-}
+  hit: "hit",
+  endgame: "endgame",
+};
+
 export class AudioManager {
   constructor() {
     this.sounds = {
-      lastHeart: new Audio("./assets/sounds/lastheart/run-vine-sound-effect.mp3"),
+      lastHeart: new Audio(
+        "./assets/sounds/lastHeart/run-vine-sound-effect.mp3",
+      ),
       hit: new Audio("./assets/sounds/hit/punch_u4LmMsr.mp3"),
-      endgame: new Audio("./assets/sounds/endgame/meme-de-creditos-finales.mp3")
+      endgame: new Audio(
+        "./assets/sounds/endgame/meme-de-creditos-finales.mp3",
+      ),
     };
 
-    Object.values(this.sounds).forEach(audio => {
+    Object.values(this.sounds).forEach((audio) => {
       audio.preload = "auto";
       audio.load();
     });
+
+    this.audio = null;
   }
 
   play(name) {
+    // Stop currently playing sound
+    if (this.audio && !this.audio.paused) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+    }
+
+    const audio = this.sounds[name];
+
+    if (!audio) return;
+
+    this.audio = audio;
+    audio.currentTime = 0;
+
+    audio.play().catch((error) => {
+      console.warn("Audio playback failed:", error);
+    });
+  }
+
+  async playAsync(name) {
     const audio = this.sounds[name];
 
     if (!audio) return;
 
     audio.currentTime = 0;
-    audio.play();
+
+    try {
+      await audio.play();
+    } catch (error) {
+      console.warn("Audio playback failed:", error);
+    }
   }
 }
