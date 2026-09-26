@@ -15,7 +15,12 @@ window.HandleGameOver = () => {
 let player1, player2;
 // AddEnemies();
 let spownEnemyInterval;
-const StartGame = () => {
+const StartGame = (isLocalMultiplayer) => {
+  document.getElementById("start_menu").classList.add("hidden");
+  const gameScene = document.getElementById("game_scene");
+  gameScene.classList.remove("hidden");
+  gameScene.classList.add("flex");
+  isGamePause = false;
   ENEMIES = [];
   EXPLOSIONS = [];
   player1 = new Player(
@@ -29,17 +34,20 @@ const StartGame = () => {
     2.5, // steeringSpeed
     1
   );
-  player2 = new Player(
-    width / 2 + 150, // x
-    height / 2, // y
-    270, // starting angle
-    0.1, // lerpSteering
-    60, // maxSteeringAngle
-    3, // acceleration
-    ctx, // context
-    2.5, // steeringSpeed
-    2
-  );
+  player2 = isLocalMultiplayer
+    ? new Player(
+        width / 2 + 150, // x
+        height / 2, // y
+        270, // starting angle
+        0.1, // lerpSteering
+        60, // maxSteeringAngle
+        3, // acceleration
+        ctx, // context
+        2.5, // steeringSpeed
+        2,
+      )
+    : null;
+  document.querySelectorAll(".player")[1].classList.toggle("hidden", !player2);
   spownEnemyInterval = setInterval(() => {
     AddEnemies();
   }, 5000);
@@ -152,4 +160,11 @@ function animate(timestamp) {
 }
 //#endregion
 
-StartGame();
+StartGame(true);
+
+document.getElementById("solo_button").addEventListener("click", () => {
+  StartGame(false);
+});
+document.getElementById("multiplayer_button").addEventListener("click", () => {
+  StartGame(true);
+});

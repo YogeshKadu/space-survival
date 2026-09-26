@@ -6,8 +6,14 @@ window.player2_tile = document.getElementById("player2_icons_tray");
 window.ctx = canvas.getContext("2d");
 window.accentColor = "#1f2937";
 canvas.style.backgroundColor = accentColor;
-window.width = canvas.width = 1000;
-window.height = canvas.height = 800;
+// window.width = canvas.width = 1000;
+// window.height = canvas.height = 800;
+
+const resizeCanvas = () => {
+  window.width =  canvas.width = canvas.clientWidth * 1.5;
+  window.height =  canvas.height = canvas.clientHeight * 1.5;
+}
+resizeCanvas();
 
 export const UpdatePlayer1HartsUI = (lives) => {
   player1_tile.innerHTML = "";
@@ -49,6 +55,6 @@ export const UpdatePlayer2HartsUI = (lives) => {
     player2_tile.appendChild(anchor);
   }
 };
-// UpdatePlayer1Harts(2);
 
+window.addEventListener('resize', resizeCanvas);
 window.audioManager = new AudioManager();

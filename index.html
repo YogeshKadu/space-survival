@@ -5,11 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Document</title>
+    <style>
+      :root {
+        --accentColor: #1f2937;
+      }
+      .bg-accent { background-color: var(--accentColor);}
+      .text-accent { color: var(--accentColor);}
+      .pattern1 {
+        --s: 150px; /* control the size*/
+        --c1: #376886;
+        --c2: #1f2937;
+        
+        --_g: #0000 90deg,var(--c1) 0;
+        background: 
+          conic-gradient(from 90deg at 2px 2px,var(--_g)),
+          conic-gradient(from 90deg at 1px 1px,var(--_g)),
+          var(--c2);
+        background-size: var(--s) var(--s), calc(var(--s)/5) calc(var(--s)/5);
+      }
+      .pattern2{
+        --dot-bg: #1f2937;
+        --dot-color: white;
+        --dot-size: 1px;
+        --dot-space: 20px;
+        background:
+          linear-gradient(90deg, var(--dot-bg) calc(var(--dot-space) - var(--dot-size)), transparent 1%) center / var(--dot-space) var(--dot-space),
+          linear-gradient(var(--dot-bg) calc(var(--dot-space) - var(--dot-size)), transparent 1%) center / var(--dot-space) var(--dot-space),
+          var(--dot-color);
+      }
+    </style>
   </head>
-  <body>
-    <main class="w-full h-dvh bg-gray-700">
-      <div id="game_scene" class="flex h-dvh flex-row justify-center">
-        <div class="player h-full flex-1 p-2">
+  <body class="relative pattern2">
+    <main class="w-full h-dvh">
+      <section id="start_menu" class="hidden #flex h-screen items-center justify-center">
+        <div class="max-w-lg w-full p-8 py-24 bg-accent border border-slate-500">
+          <div class="h-full flex flex-col justify-center">
+            <p class="text-center">
+              <small class="font-mono text-white">Enjoy your Retro game !</small>
+            </p>
+            <h1 class="uppercase text-center text-5xl text-yellow-300 font-semibold my-5">
+              Space<br/> Survival
+            </h1>
+            <div class="text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-14 mx-auto text-blue-600 mb-8" width="1em" height="1em" viewBox="0 0 56 56">
+                <path d="M0 0h56v56H0z" fill="none" />
+                <path fill="currentColor" d="M46.645 44.29c0-.938-.422-1.688-.915-2.673l-14.6-30.093c-.985-2.016-1.899-2.649-3.117-2.649c-1.242 0-2.157.633-3.14 2.649L10.27 41.617c-.493 1.008-.915 1.758-.915 2.696c0 1.734 1.336 2.812 3.375 2.812l30.54-.023c2.062 0 3.374-1.079 3.374-2.813" />
+              </svg>
+            </div>
+            <p class="text-center mb-5">
+              <span class="uppercase text-white font-mono">select your name</span>
+            </p>
+            <div class="w-full flex flex-wrap gap-5 font-mono">
+              <button id="solo_button" class="rounded-xl flex-1 basis-36 bg-pink-600 py-3 border-b-8 border-pink-900 text-white">
+                <p class="font-semibold text-lg">SOLO</p>
+                <small>1P - WASD</small>
+              </button>
+              <button id="multiplayer_button" class="rounded-xl flex-1 basis-36 bg-pink-600 py-3 border-b-8 border-pink-900 text-white">
+                <p class="font-semibold text-lg">LOCAL 2P</p>
+                <small>1P-WASD • P2-ARROWS</small>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="game_scene" class="flex #hidden h-dvh flex-row justify-center p-3 gap-3">
+        <div class="player h-full flex-none w-64">
+          <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border">
+            <h3 class="font-semibold text-[cyan] uppercase text-lg">Player 1</h3>
+            <div id="player1_icons_tray" class="flex gap-1 mt-2 h-5">
+              <img src="./assets/fullheart.png" alt="heart icons">
+              <img src="./assets/fullheart.png" alt="heart icons">
+              <img src="./assets/fullheart.png" alt="heart icons">
+            </div>
+          </div>
+          <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0">
+            <p class="text-white text-xs">Use <span class="text-[cyan]">WASD</span> keys !</p>
+          </div>
+        </div>
+        <div class="_canvas_ flex-1">
+          <canvas id="canvas" class="h-full w-full border border-slate-500"></canvas>
+        </div>
+        <div class="player h-full flex-none w-64">
+          <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border">
+            <h3 class="font-semibold text-[#00FF00] uppercase text-lg text-right">Player 2</h3>
+            <div id="player2_icons_tray" class="flex gap-1 mt-2 h-5 justify-end">
+              <img src="./assets/fullheart.png" alt="heart icons">
+              <img src="./assets/fullheart.png" alt="heart icons">
+              <img src="./assets/fullheart.png" alt="heart icons">
+            </div>
+          </div>
+          <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0 text-right">
+            <p class="text-white text-xs">Use <span class="text-[#00FF00]">ARROW</span> keys !</p>
+          </div>
+        </div>
+        <!-- <div class="player h-full flex-1 p-2">
           <h3 class="font-sans font-medium text-[cyan] uppercase">Player 1</h3>
           <div id="player1_icons_tray" class="flex flex-row gap-1 h-3">
             <a
@@ -93,8 +182,8 @@
               />
             </a>
           </div>
-        </div>
-      </div>
+        </div> -->
+      </section>
     </main>
     <script type="module" src="./utils/initializeCanvas.js"></script>
     <script type="module" src="./index.js"></script>
