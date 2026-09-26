@@ -160,7 +160,7 @@ function animate(timestamp) {
 }
 //#endregion
 
-StartGame(true);
+// StartGame(true);
 
 document.getElementById("solo_button").addEventListener("click", () => {
   StartGame(false);
