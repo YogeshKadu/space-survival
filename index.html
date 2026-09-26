@@ -5,15 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Document</title>
-    <!-- <style type="text/tailwindcss">
-      @theme {
-        --color-clifford: #da373d;
-      }
-    </style> -->
   </head>
   <body>
     <main class="w-full h-dvh bg-gray-700">
-      <div class="flex h-dvh flex-row justify-center">
+      <div id="game_scene" class="flex h-dvh flex-row justify-center">
         <div class="player h-full flex-1 p-2">
           <h3 class="font-sans font-medium text-[cyan] uppercase">Player 1</h3>
           <div id="player1_icons_tray" class="flex flex-row gap-1 h-3">
@@ -57,7 +52,9 @@
         </div>
         <canvas id="canvas" class=""></canvas>
         <div class="player h-full flex-1 p-2">
-          <h3 class="font-sans font-medium text-[#00FF00] uppercase">Player 2</h3>
+          <h3 class="font-sans font-medium text-[#00FF00] uppercase">
+            Player 2
+          </h3>
           <div id="player2_icons_tray" class="flex flex-row gap-1 h-3">
             <a
               href="https://www.flaticon.com/free-icons/heart"
@@ -100,7 +97,6 @@
       </div>
     </main>
     <script type="module" src="./utils/initializeCanvas.js"></script>
-    <!-- <script type="module" src="./script.js"></script> -->
     <script type="module" src="./index.js"></script>
   </body>
 </html>

@@ -1,4 +1,7 @@
-import { UpdatePlayer1HartsUI, UpdatePlayer2HartsUI } from "./initializeCanvas.js";
+import {
+  UpdatePlayer1HartsUI,
+  UpdatePlayer2HartsUI,
+} from "./initializeCanvas.js";
 import { keys } from "./input.js";
 import { generateRandomId, getAngle, getRadian, lerp } from "./utils.js";
 
@@ -144,14 +147,15 @@ export class Player extends Entity {
   decreaseLives() {
     this.lives -= 1;
     if (this.lives == 1 && audioManager) {
-      audioManager?.playAsync(audios.lastHeart);
+      audioManager?.playReplacing(audios.lastHeart);
     }
     if (this.controller == 1) UpdatePlayer1HartsUI(this.lives);
     else UpdatePlayer2HartsUI(this.lives);
     if (this.lives <= 0) {
       HandleGameOver();
+      setRipple(this.x, this.y)
       console.log("Player died");
-      audioManager?.play("endgame");
+      audioManager?.playReplacing("endgame");
       isGamePause = true;
     } else {
       addExplosion(this.x, this.y);
@@ -316,6 +320,43 @@ export class Explosion {
   }
 }
 
+export class DeathRipple {
+  constructor(x, y, maxRadius = 30, speed = 1) {
+    this.x = x;
+    this.y = y;
+    this.radius = 0;
+    this.maxRadius = maxRadius;
+    this.speed = speed;
+    this.alpha = 1;
+    this.lineWidth = 4;
+  }
+
+  update() {
+    this.radius = Math.min(this.radius + this.speed, this.maxRadius);
+    this.alpha = 1 - this.radius / this.maxRadius;
+    if(this.radius >= this.maxRadius) {
+      this.radius = 0;
+    }
+  }
+
+  draw(ctx) {
+    if (this.finished) return;
+
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.strokeStyle = "#ff2020";
+    ctx.lineWidth = this.lineWidth;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  get finished() {
+    return this.radius >= this.maxRadius;
+  }
+}
+
 const audios = {
   lastHeart: "lastHeart",
   hit: "hit",
@@ -339,39 +380,34 @@ export class AudioManager {
       audio.load();
     });
 
-    this.audio = null;
+    this.currentAudio = null;
   }
 
-  play(name) {
-    // Stop currently playing sound
-    if (this.audio && !this.audio.paused) {
-      this.audio.pause();
-      this.audio.currentTime = 0;
+  playReplacing(name) {
+    const source = this.sounds[name];
+    if (!source) return;
+
+    if (this.currentAudio && !this.currentAudio.paused) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
     }
 
-    const audio = this.sounds[name];
-
-    if (!audio) return;
-
-    this.audio = audio;
-    audio.currentTime = 0;
+    const audio = source.cloneNode();
+    this.currentAudio = audio;
 
     audio.play().catch((error) => {
       console.warn("Audio playback failed:", error);
     });
   }
 
-  async playAsync(name) {
-    const audio = this.sounds[name];
+  async play(name) {
+    const source = this.sounds[name];
+    if (!source) return;
 
-    if (!audio) return;
-
-    audio.currentTime = 0;
-
-    try {
-      await audio.play();
-    } catch (error) {
+    // A fresh element lets this call finish independently of other calls.
+    const audio = source.cloneNode();
+    audio.play().catch((error) => {
       console.warn("Audio playback failed:", error);
-    }
+    });
   }
 }

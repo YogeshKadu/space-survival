@@ -1,4 +1,4 @@
-import { Player, Enemy, Explosion } from "./utils/Entity.js";
+import { Player, Enemy, Explosion, DeathRipple } from "./utils/Entity.js";
 import { randomClouds, spawnEnemy } from "./utils/utils.js";
 
 window.isDebug = false;
@@ -6,10 +6,10 @@ window.isGamePause = false;
 window.addExplosion = (x = 0, y = 0) => {
   EXPLOSIONS.push(new Explosion(x, y));
 };
-
+window.setRipple = (x = 0, y = 0) => deathRipple=new DeathRipple(x,y);
 window.HandleGameOver = () => {
+  // player1 = null;
   clearInterval(spownEnemyInterval);
-  player1 = null;
 };
 
 let player1, player2;
@@ -49,6 +49,7 @@ const StartGame = () => {
 //#region Enemy Handling
 let ENEMIES = [];
 let EXPLOSIONS = [];
+let deathRipple = null;
 const AddEnemies = () => {
   const enemyCount = 3;
   const lerpSteering = 0.04;
@@ -79,7 +80,7 @@ const UpdateEnemies = () => {
       continue;
     }
     ENEMIES[i].calculate();
-    ENEMIES[i].update();
+    if(!isGamePause) ENEMIES[i].update();
     ENEMIES[i].draw();
     ENEMIES[i].calculatePlayerCollusion();
 
@@ -123,23 +124,31 @@ function animate(timestamp) {
   if (deltaTime > interval) {
     lastTime = timestamp - (deltaTime % interval);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if(isGamePause) {
+      // only animate when game is paused
+    } else {
+      // only animate when game is **not** paused
+    }
     if (player1) {
       player1?.calculate();
-      player1?.update();
+      if(!isGamePause) player1?.update();
       player1?.draw();
     }
     if (player2) {
       player2?.calculate();
-      player2?.update();
+      if(!isGamePause) player2?.update();
       player2?.draw();
     }
-
     UpdateEnemies();
-    UpdateExplosions();
 
+    if(deathRipple) {
+      deathRipple.update();
+      deathRipple.draw(ctx);
+    }
+    UpdateExplosions();
     randomClouds(ctx);
   }
-  if (!isGamePause) requestAnimationFrame(animate);
+  requestAnimationFrame(animate);
 }
 //#endregion
 
