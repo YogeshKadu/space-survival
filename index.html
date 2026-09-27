@@ -81,21 +81,52 @@
           <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0">
             <p class="text-white text-xs">Use <span class="text-[cyan]">WASD</span> keys !</p>
           </div>
+          <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0">
+            <h3 class="text-white text-xs">SCORE: <span class="font-semibold text-[cyan] uppercase text-lg">444</span></h3>
+          </div>
         </div>
         <div class="_canvas_ flex-1">
           <canvas id="canvas" class="h-full w-full border border-slate-500"></canvas>
         </div>
-        <div class="player h-full flex-none w-64">
-          <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border">
-            <h3 class="font-semibold text-[#00FF00] uppercase text-lg text-right">Player 2</h3>
-            <div id="player2_icons_tray" class="flex gap-1 mt-2 h-5 justify-end">
-              <img src="./assets/fullheart.png" alt="heart icons">
-              <img src="./assets/fullheart.png" alt="heart icons">
-              <img src="./assets/fullheart.png" alt="heart icons">
+        <div class="h-full flex-none w-64 flex flex-col">
+          <div class="player">
+            <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border">
+              <h3 class="font-semibold text-[#00FF00] uppercase text-lg text-right">Player 2</h3>
+              <div id="player2_icons_tray" class="flex gap-1 mt-2 h-5 justify-end">
+                <img src="./assets/fullheart.png" alt="heart icons">
+                <img src="./assets/fullheart.png" alt="heart icons">
+                <img src="./assets/fullheart.png" alt="heart icons">
+              </div>
+            </div>
+            <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0 text-right">
+              <p class="text-white text-xs">Use <span class="text-[#00FF00]">ARROW</span> keys !</p>
+            </div>
+            <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0 text-right">
+              <h3 class="text-white text-xs">SCORE: <span class="font-semibold text-[#00FF00] uppercase text-lg">444</span></h3>
             </div>
           </div>
-          <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0 text-right">
-            <p class="text-white text-xs">Use <span class="text-[#00FF00]">ARROW</span> keys !</p>
+          <div class="setting p-2 bg-accent border border-slate-500 mt-auto">
+            <!-- Game pause -->
+            <!-- Audio and SFX -->
+             <h4 class="text-white mb-3 p-2 text-center">SETTINGS</h4>
+             <div class="flex flex-col gap-3">
+               <div class="h-12">
+                 <button id="debug-control" class="bg-pink-600 h-full w-full border-b-4 border-pink-900 active:border-b-0 active:scale-y-105 origin-top transition-all relative">
+                   <span class="text-white uppercase">DEBUGGER - OFF</span>
+                 </button>
+               </div>
+               <div class="h-12">
+                 <button id="pause-control" class="bg-pink-600 h-full w-full border-b-4 border-pink-900 active:border-b-0 active:scale-y-105 origin-top transition-all relative">
+                   <span class="text-white uppercase">PAUSE</span>
+                 </button>
+               </div>
+               <div class="h-12">
+                 <button id="audio-control" class="bg-pink-600 h-full w-full border-b-4 border-pink-900 active:border-b-0 active:scale-y-105 origin-top transition-all relative">
+                   <span class="text-white uppercase">MUTE</span>
+                 </button>
+               </div>
+             </div>
+             
           </div>
         </div>
         <!-- <div class="player h-full flex-1 p-2">

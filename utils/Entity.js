@@ -51,6 +51,7 @@ class Entity {
 }
 
 export class Player extends Entity {
+  static maxLives = 3;
   constructor(
     x = 0,
     y = 0,
@@ -66,7 +67,7 @@ export class Player extends Entity {
     this.ctx = ctx;
     this.radius = 10;
     this.steeringSpeed = steeringSpeed;
-    this.lives = 3;
+    this.lives = Player.maxLives;
     this.controller = controller;
   }
   calculate() {
@@ -119,8 +120,12 @@ export class Player extends Entity {
     this.ctx.beginPath();
     this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     this.ctx.closePath();
-    this.ctx.strokeStyle = "#FFF";
-    this.ctx.stroke();
+    if(this.controller == 1) {
+      this.ctx.fillStyle = "cyan";
+    }else {
+      this.ctx.fillStyle = "#00FF00";
+    }
+    this.ctx.fill();
     this.ctx.save();
   }
   draw() {
@@ -152,9 +157,9 @@ export class Player extends Entity {
     if (this.controller == 1) UpdatePlayer1HartsUI(this.lives);
     else UpdatePlayer2HartsUI(this.lives);
     if (this.lives <= 0) {
-      HandleGameOver();
-      setRipple(this.x, this.y)
-      console.log("Player died");
+      gameOverEvent.trigger();
+      setRipple(this.x, this.y);
+      console.log("Player died - ", gameOverEvent.events);
       audioManager?.playReplacing("endgame");
       isGamePause = true;
     } else {
@@ -381,10 +386,12 @@ export class AudioManager {
     });
 
     this.currentAudio = null;
+    this.mute = false;
   }
 
   playReplacing(name) {
     const source = this.sounds[name];
+    // if (!source || this.mute) return;
     if (!source) return;
 
     if (this.currentAudio && !this.currentAudio.paused) {
@@ -394,6 +401,7 @@ export class AudioManager {
 
     const audio = source.cloneNode();
     this.currentAudio = audio;
+    this.currentAudio.volume = this.mute ? 0 : 1;
 
     audio.play().catch((error) => {
       console.warn("Audio playback failed:", error);
@@ -402,12 +410,30 @@ export class AudioManager {
 
   async play(name) {
     const source = this.sounds[name];
+    // if (!source || this.mute) return;
     if (!source) return;
 
     // A fresh element lets this call finish independently of other calls.
     const audio = source.cloneNode();
+    audio.volume = this.mute ? 0 : 1;
+
     audio.play().catch((error) => {
       console.warn("Audio playback failed:", error);
     });
   }
+  muteAudio() {
+    this.mute = true;
+    if (this.currentAudio && !this.currentAudio.paused) {
+      this.currentAudio.volume = 0;
+    //   this.currentAudio.pause();
+    //   this.currentAudio.currentTime = 0;
+    }
+  }
+  unmuteAudio () {
+    this.mute = false;
+    if (this.currentAudio && !this.currentAudio.paused) {
+      this.currentAudio.volume = 1;
+    }
+  }
+  get isMute() {return this.mute;}
 }

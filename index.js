@@ -1,58 +1,14 @@
 import { Player, Enemy, Explosion, DeathRipple } from "./utils/Entity.js";
 import { randomClouds, spawnEnemy } from "./utils/utils.js";
 
-window.isDebug = false;
-window.isGamePause = false;
+window.setRipple = (x = 0, y = 0) => deathRipple=new DeathRipple(x,y);
 window.addExplosion = (x = 0, y = 0) => {
   EXPLOSIONS.push(new Explosion(x, y));
 };
-window.setRipple = (x = 0, y = 0) => deathRipple=new DeathRipple(x,y);
-window.HandleGameOver = () => {
-  // player1 = null;
-  clearInterval(spownEnemyInterval);
-};
 
 let player1, player2;
-// AddEnemies();
-let spownEnemyInterval;
-const StartGame = (isLocalMultiplayer) => {
-  document.getElementById("start_menu").classList.add("hidden");
-  const gameScene = document.getElementById("game_scene");
-  gameScene.classList.remove("hidden");
-  gameScene.classList.add("flex");
-  isGamePause = false;
-  ENEMIES = [];
-  EXPLOSIONS = [];
-  player1 = new Player(
-    width / 2 - 150, // x
-    height / 2, // y
-    270, // starting angle
-    0.1, // lerpSteering
-    60, // maxSteeringAngle
-    3, // acceleration
-    ctx, // context
-    2.5, // steeringSpeed
-    1
-  );
-  player2 = isLocalMultiplayer
-    ? new Player(
-        width / 2 + 150, // x
-        height / 2, // y
-        270, // starting angle
-        0.1, // lerpSteering
-        60, // maxSteeringAngle
-        3, // acceleration
-        ctx, // context
-        2.5, // steeringSpeed
-        2,
-      )
-    : null;
-  document.querySelectorAll(".player")[1].classList.toggle("hidden", !player2);
-  spownEnemyInterval = setInterval(() => {
-    AddEnemies();
-  }, 5000);
-  requestAnimationFrame(animate);
-};
+let spawnEnemyInterval = null;
+
 
 //#region Enemy Handling
 let ENEMIES = [];
@@ -160,11 +116,51 @@ function animate(timestamp) {
 }
 //#endregion
 
-// StartGame(true);
-
-document.getElementById("solo_button").addEventListener("click", () => {
-  StartGame(false);
+gameStartEvent.addHandler("start-initialize-js", () => {
+  console.log("start-initialize-js called")
+  ENEMIES = [];
+  EXPLOSIONS = [];
+  deathRipple = null;
+  player1 = new Player(
+    width / 2 - 150, // x
+    height / 2, // y
+    270, // starting angle
+    0.1, // lerpSteering
+    60, // maxSteeringAngle
+    3, // acceleration
+    ctx, // context
+    2.5, // steeringSpeed
+    1
+  );
+  player2 = !isSolo
+    ? new Player(
+        width / 2 + 150, // x
+        height / 2, // y
+        270, // starting angle
+        0.1, // lerpSteering
+        60, // maxSteeringAngle
+        3, // acceleration
+        ctx, // context
+        2.5, // steeringSpeed
+        2,
+      )
+    : null;
+  spawnEnemyInterval = setInterval(() => {
+    console.log("spawnEnemyInterval called");
+    AddEnemies();
+  }, 5000);
 });
-document.getElementById("multiplayer_button").addEventListener("click", () => {
-  StartGame(true);
+requestAnimationFrame(animate);
+gameOverEvent.addHandler("pauseEnemy",() => {
+  if(spawnEnemyInterval)
+    clearInterval(spawnEnemyInterval);
+});
+gamePauseEvent.addHandler("pause-enemy",() => {
+  if(spawnEnemyInterval)
+    clearInterval(spawnEnemyInterval);
+});
+gameResumeEvent.addHandler("resume-enemy", () => {
+  spawnEnemyInterval = setInterval(() => {
+    AddEnemies();
+  }, 5000);
 });
