@@ -30,6 +30,7 @@ export const randomClouds = (ctx) => {
   ctx.strokeStyle = "white";
   ctx.rect(800, 400, 70, 20);
   ctx.stroke();
+  ctx.closePath();
   ctx.save();
 };
 

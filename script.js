@@ -122,7 +122,6 @@ class Enemy {
     this.velocity = (newRadian * 180) / Math.PI;
     this.velocityRadian = newRadian;
 
-    // console.log("Angle - ", this.angle, " Radian - ", this.radian);
     this.x += Math.cos(this.velocityRadian) * this.acceleration;
     this.y += Math.sin(this.velocityRadian) * this.acceleration;
   }

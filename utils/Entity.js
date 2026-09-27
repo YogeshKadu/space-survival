@@ -1,3 +1,4 @@
+import { audios } from "./AudioManager.js";
 import {
   UpdatePlayer1HartsUI,
   UpdatePlayer2HartsUI,
@@ -94,7 +95,7 @@ export class Player extends Entity {
     const angleY = Math.sin(this.radian) * 40;
 
     this.ctx.save();
-    // this.ctx.beginPath();
+    this.ctx.beginPath();
     this.ctx.translate(this.x, this.y);
     this.ctx.moveTo(angleX, angleY);
     this.ctx.lineTo(0, 0);
@@ -152,16 +153,14 @@ export class Player extends Entity {
   decreaseLives() {
     this.lives -= 1;
     if (this.lives == 1 && audioManager) {
-      audioManager?.playReplacing(audios.lastHeart);
+      audioManager?.play(audios.lastHeart);
     }
     if (this.controller == 1) UpdatePlayer1HartsUI(this.lives);
     else UpdatePlayer2HartsUI(this.lives);
     if (this.lives <= 0) {
       gameOverEvent.trigger();
       setRipple(this.x, this.y);
-      console.log("Player died - ", gameOverEvent.events);
-      audioManager?.playReplacing("endgame");
-      isGamePause = true;
+      audioManager?.play("endgame");
     } else {
       addExplosion(this.x, this.y);
       audioManager?.play("hit");
@@ -360,80 +359,4 @@ export class DeathRipple {
   get finished() {
     return this.radius >= this.maxRadius;
   }
-}
-
-const audios = {
-  lastHeart: "lastHeart",
-  hit: "hit",
-  endgame: "endgame",
-};
-
-export class AudioManager {
-  constructor() {
-    this.sounds = {
-      lastHeart: new Audio(
-        "./assets/sounds/lastHeart/run-vine-sound-effect.mp3",
-      ),
-      hit: new Audio("./assets/sounds/hit/punch_u4LmMsr.mp3"),
-      endgame: new Audio(
-        "./assets/sounds/endgame/meme-de-creditos-finales.mp3",
-      ),
-    };
-
-    Object.values(this.sounds).forEach((audio) => {
-      audio.preload = "auto";
-      audio.load();
-    });
-
-    this.currentAudio = null;
-    this.mute = false;
-  }
-
-  playReplacing(name) {
-    const source = this.sounds[name];
-    // if (!source || this.mute) return;
-    if (!source) return;
-
-    if (this.currentAudio && !this.currentAudio.paused) {
-      this.currentAudio.pause();
-      this.currentAudio.currentTime = 0;
-    }
-
-    const audio = source.cloneNode();
-    this.currentAudio = audio;
-    this.currentAudio.volume = this.mute ? 0 : 1;
-
-    audio.play().catch((error) => {
-      console.warn("Audio playback failed:", error);
-    });
-  }
-
-  async play(name) {
-    const source = this.sounds[name];
-    // if (!source || this.mute) return;
-    if (!source) return;
-
-    // A fresh element lets this call finish independently of other calls.
-    const audio = source.cloneNode();
-    audio.volume = this.mute ? 0 : 1;
-
-    audio.play().catch((error) => {
-      console.warn("Audio playback failed:", error);
-    });
-  }
-  muteAudio() {
-    this.mute = true;
-    if (this.currentAudio && !this.currentAudio.paused) {
-      this.currentAudio.volume = 0;
-    //   this.currentAudio.pause();
-    //   this.currentAudio.currentTime = 0;
-    }
-  }
-  unmuteAudio () {
-    this.mute = false;
-    if (this.currentAudio && !this.currentAudio.paused) {
-      this.currentAudio.volume = 1;
-    }
-  }
-  get isMute() {return this.mute;}
 }

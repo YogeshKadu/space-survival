@@ -6,6 +6,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Document</title>
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=Nabla&family=Oxanium:wght@200..800&display=swap');
+      
+      .font-nabla {
+        font-family: "Nabla", system-ui;
+        font-optical-sizing: auto;
+        /* font-weight: 400; */
+        /* font-style: normal; */
+        /* font-variation-settings:
+          "EDPT" 100,
+          "EHLT" 12; */
+      }
+      .font-oxanium {
+        font-family: "Oxanium", sans-serif;
+        font-optical-sizing: auto;
+        /* font-weight: <weight>;
+        font-style: normal; */
+      }
       :root {
         --accentColor: #1f2937;
       }
@@ -35,32 +52,32 @@
       }
     </style>
   </head>
-  <body class="relative pattern2">
+  <body class="relative pattern2 font-mono">
     <main class="w-full h-dvh">
       <section id="start_menu" class="#hidden flex h-screen items-center justify-center">
         <div class="max-w-lg w-full p-8 py-24 bg-accent border border-slate-500">
           <div class="h-full flex flex-col justify-center">
             <p class="text-center">
-              <small class="font-mono text-white">Enjoy your Retro game !</small>
+              <small class="text-white">Enjoy your Retro game !</small>
             </p>
-            <h1 class="uppercase text-center text-5xl text-yellow-300 font-semibold my-5">
+            <h1 class="uppercase text-center text-5xl text-yellow-300 font-semibold my-5 text-shadow-[4px_4px] text-shadow-pink-500">
               Space<br/> Survival
             </h1>
             <div class="text-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="size-14 mx-auto text-blue-600 mb-8" width="1em" height="1em" viewBox="0 0 56 56">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-14 mx-auto text-cyan-500 mb-8" width="1em" height="1em" viewBox="0 0 56 56">
                 <path d="M0 0h56v56H0z" fill="none" />
                 <path fill="currentColor" d="M46.645 44.29c0-.938-.422-1.688-.915-2.673l-14.6-30.093c-.985-2.016-1.899-2.649-3.117-2.649c-1.242 0-2.157.633-3.14 2.649L10.27 41.617c-.493 1.008-.915 1.758-.915 2.696c0 1.734 1.336 2.812 3.375 2.812l30.54-.023c2.062 0 3.374-1.079 3.374-2.813" />
               </svg>
             </div>
             <p class="text-center mb-5">
-              <span class="uppercase text-white font-mono">select your name</span>
+              <span class="uppercase text-white">select your game</span>
             </p>
-            <div class="w-full flex flex-wrap gap-5 font-mono">
-              <button id="solo_button" class="rounded-xl flex-1 basis-36 bg-pink-600 py-3 border-b-8 border-pink-900 text-white">
+            <div class="w-full flex flex-wrap gap-5 leading-3">
+              <button id="solo_button" class="flex-1 basis-36 bg-pink-600 pt-3 pb-4 border-b-8 border-pink-900 text-white cursor-pointer active:scale-105 transition-transform">
                 <p class="font-semibold text-lg">SOLO</p>
                 <small>1P - WASD</small>
               </button>
-              <button id="multiplayer_button" class="rounded-xl flex-1 basis-36 bg-pink-600 py-3 border-b-8 border-pink-900 text-white">
+              <button id="multiplayer_button" class="flex-1 basis-36 bg-pink-600 pt-3 pb-4 border-b-8 border-pink-900 text-white cursor-pointer active:scale-105 transition-transform">
                 <p class="font-semibold text-lg">LOCAL 2P</p>
                 <small>1P-WASD • P2-ARROWS</small>
               </button>
@@ -69,20 +86,62 @@
         </div>
       </section>
       <section id="game_scene" class="#flex hidden h-dvh flex-row justify-center p-3 gap-3">
-        <div class="player h-full flex-none w-64">
-          <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border">
-            <h3 class="font-semibold text-[cyan] uppercase text-lg">Player 1</h3>
-            <div id="player1_icons_tray" class="flex gap-1 mt-2 h-5">
-              <img src="./assets/fullheart.png" alt="heart icons">
-              <img src="./assets/fullheart.png" alt="heart icons">
-              <img src="./assets/fullheart.png" alt="heart icons">
+        <div class="player h-full flex-none w-64 flex flex-col">
+          <div>
+            <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border">
+              <h3 class="font-semibold text-cyan-500 uppercase text-lg">Player 1</h3>
+              <div id="player1_icons_tray" class="flex gap-1 mt-2 h-5">
+                <img src="./assets/fullheart.png" alt="heart icons">
+                <img src="./assets/fullheart.png" alt="heart icons">
+                <img src="./assets/fullheart.png" alt="heart icons">
+              </div>
             </div>
+            <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0">
+              <p class="text-white text-xs">Use <span class="text-cyan-500">WASD</span> keys !</p>
+            </div>
+            <!-- <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0">
+              <h3 class="text-white text-xs">SCORE: <span class="font-semibold text-cyan-500 uppercase text-lg">444</span></h3>
+            </div> -->
           </div>
-          <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0">
-            <p class="text-white text-xs">Use <span class="text-[cyan]">WASD</span> keys !</p>
-          </div>
-          <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0">
-            <h3 class="text-white text-xs">SCORE: <span class="font-semibold text-[cyan] uppercase text-lg">444</span></h3>
+          <div class="power-ups p-2 bg-accent border border-slate-500 mt-auto">
+            <!-- power up's -->
+             <div class="mb-3 p-2 text-white text-center">
+               <h4>POWER UP'S</h4>
+               <small class="block leading-tight mt-2">You will get random power ups in within game</small>
+             </div>
+             <div class="flex flex-col gap-3">
+              <div class="h-12 flex items-center fap-2 border border-slate-500 text-white">
+                <span class="avatar h-full aspect-square grid place-content-center text-red-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                    <path d="M0 0h24v24H0z" fill="none" />
+                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 3C4.239 3 2 5.216 2 7.95c0 2.207.875 7.445 9.488 12.74a.99.99 0 0 0 1.024 0C21.126 15.395 22 10.157 22 7.95C22 5.216 19.761 3 17 3s-5 3-5 3s-2.239-3-5-3" />
+                  </svg>
+                </span>
+                <p>LIVE</p>
+              </div>
+              <div class="h-12 flex items-center fap-2 border border-slate-500 text-white">
+                <span class="avatar h-full aspect-square grid place-content-center text-cyan-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                    <path d="M0 0h24v24H0z" fill="none" />
+                    <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
+                  </svg>
+
+                </span>
+                <p>SHIELD</p>
+              </div>
+              <div class="h-12 flex items-center fap-2 border border-slate-500 text-white">
+                <span class="avatar h-full aspect-square grid place-content-center text-amber-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16">
+                    <path d="M0 0h16v16H0z" fill="none" />
+                    <g fill="currentColor" fill-rule="evenodd">
+                      <path d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707L2.354 9.354a.5.5 0 1 1-.708-.708z" />
+                      <path d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z" />
+                    </g>
+                  </svg>
+                </span>
+                <p>SPEED UP</p>
+              </div>
+             </div>
           </div>
         </div>
         <div class="_canvas_ flex-1">
@@ -101,18 +160,22 @@
             <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0 text-right">
               <p class="text-white text-xs">Use <span class="text-[#00FF00]">ARROW</span> keys !</p>
             </div>
-            <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0 text-right">
+            <!-- <div class="bg-accent w-full max-w-xs py-2 px-4 border-slate-500 border border-t-0 text-right">
               <h3 class="text-white text-xs">SCORE: <span class="font-semibold text-[#00FF00] uppercase text-lg">444</span></h3>
-            </div>
+            </div> -->
           </div>
           <div class="setting p-2 bg-accent border border-slate-500 mt-auto">
-            <!-- Game pause -->
-            <!-- Audio and SFX -->
+            <!-- in game settings Audio and SFX -->
              <h4 class="text-white mb-3 p-2 text-center">SETTINGS</h4>
              <div class="flex flex-col gap-3">
                <div class="h-12">
+                 <button id="main-menu-button" class="bg-pink-600 h-full w-full border-b-4 border-pink-900 active:border-b-0 active:scale-y-105 origin-top transition-all relative">
+                   <span class="text-white uppercase">Main Menu</span>
+                 </button>
+               </div>
+               <div class="h-12">
                  <button id="debug-control" class="bg-pink-600 h-full w-full border-b-4 border-pink-900 active:border-b-0 active:scale-y-105 origin-top transition-all relative">
-                   <span class="text-white uppercase">DEBUGGER - OFF</span>
+                   <span class="text-white uppercase">DEBUGGER - ON</span>
                  </button>
                </div>
                <div class="h-12">
@@ -126,11 +189,10 @@
                  </button>
                </div>
              </div>
-             
           </div>
         </div>
         <!-- <div class="player h-full flex-1 p-2">
-          <h3 class="font-sans font-medium text-[cyan] uppercase">Player 1</h3>
+          <h3 class="font-sans font-medium text-cyan-500 uppercase">Player 1</h3>
           <div id="player1_icons_tray" class="flex flex-row gap-1 h-3">
             <a
               href="https://www.flaticon.com/free-icons/heart"

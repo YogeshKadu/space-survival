@@ -2,31 +2,24 @@ export default class GameEvent {
     constructor() {
         this.events = [];
     }
-    addHandler = (key, callback, callOnce = false) => {
+    subscribe = (key, callback, callOnce = false) => {
         const isPresent = this.events.findIndex(event=> event.key == key);
         if(isPresent === -1) {
-            this.events.push({key, callback, callOnce, firstRun:false});
+            this.events.push({key, callback, callOnce});
             return {isSuccess: true, message: "Event added !"}
         } else {
             return {isSuccess: false, message: "Event already present !"}
         }
     }
-    removeHandler = (key) => {
+    unsubscribe = (key) => {
         this.events = this.events.filter(event=> event.key != key);
     }
     trigger = () => {
-        this.events = this.events.map((event) => {
-            const { callback, callOnce, firstRun } = event;
-            if(callOnce && firstRun) {
-                // already called.
-                return;
-            }
+        this.events = this.events.filter((event) => {
+            const { key, callback, callOnce } = event;
             callback();
-            return { ...event, firstRun: true }
+            console.log(`Game Event - ${key} Triggered`);
+            return !callOnce;
         });
-        this.#AfterTrigger();
     }
-    #AfterTrigger = () => {
-        this.events.filter(event => event.callOnce && event.firstRun ? false : true);
-    }
-} 
+}

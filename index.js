@@ -8,14 +8,12 @@ window.addExplosion = (x = 0, y = 0) => {
 
 let player1, player2;
 let spawnEnemyInterval = null;
-
-
 //#region Enemy Handling
 let ENEMIES = [];
 let EXPLOSIONS = [];
 let deathRipple = null;
 const AddEnemies = () => {
-  const enemyCount = 3;
+  const enemyCount = 4; //6 - for high difficulties 
   const lerpSteering = 0.04;
   const maxSteeringAngle = 40;
   const acceleration = 4;
@@ -38,38 +36,39 @@ const AddEnemies = () => {
   }
 };
 const UpdateEnemies = () => {
-  for (let i = ENEMIES.length - 1; i >= 0; i--) {
-    if (!ENEMIES[i] || ENEMIES[i].destroyed) {
-      console.log(`ENEMIES[${i}] skipped - `, ENEMIES[i]);
+  ENEMIES = ENEMIES.filter((enemy) => !enemy.destroyed);
+  ENEMIES.map((enemy, index) => {
+    enemy.calculate();
+    if(!isGamePause) enemy.update();
+    enemy.draw();
+    enemy.calculatePlayerCollusion();
+  });
+  if(!isGamePause)
+  for (let i = 0; i < ENEMIES.length; i++) {
+    if (ENEMIES[i].destroyed) {
+      console.log(`ENEMIES[i] skipped - `, ENEMIES[i]);
       continue;
-    }
-    ENEMIES[i].calculate();
-    if(!isGamePause) ENEMIES[i].update();
-    ENEMIES[i].draw();
-    ENEMIES[i].calculatePlayerCollusion();
+    };
+    for (let j = i + 1; j < ENEMIES.length; j++) {
+      if (ENEMIES[j].destroyed) {
+        console.log(`ENEMIES[j] skipped - `, ENEMIES[j]);
+        continue
+      };
+      const e1 = ENEMIES[i];
+      const e2 = ENEMIES[j];
 
-    for (let i = 0; i < ENEMIES.length; i++) {
-      if (ENEMIES[i].destroyed) continue;
-      for (let j = i + 1; j < ENEMIES.length; j++) {
-        if (ENEMIES[j].destroyed) continue;
-        const e1 = ENEMIES[i];
-        const e2 = ENEMIES[j];
+      const dx = e1.x - e2.x;
+      const dy = e1.y - e2.y;
 
-        const dx = e1.x - e2.x;
-        const dy = e1.y - e2.y;
-
-        if (Math.hypot(dx, dy) < e1.radius + e2.radius) {
-          e1.destroyed = true;
-          e2.destroyed = true;
-          audioManager?.play("hit");
-          addExplosion(e1.x, e1.y);
-        }
+      if (Math.hypot(dx, dy) < e1.radius + e2.radius) {
+        e1.destroyed = true;
+        e2.destroyed = true;
+        audioManager?.play("hit");
+        addExplosion(e1.x, e1.y);
       }
     }
   }
-  ENEMIES = ENEMIES.filter((enemy) => !enemy.destroyed);
 };
-
 const UpdateExplosions = () => {
   EXPLOSIONS.forEach((explosion) => {
     explosion.update();
@@ -80,6 +79,7 @@ const UpdateExplosions = () => {
 //#endregion
 
 //#region animation
+let animationId = -1;
 let lastTime = 0;
 const fps = 60;
 const interval = 1000 / fps;
@@ -88,11 +88,6 @@ function animate(timestamp) {
   if (deltaTime > interval) {
     lastTime = timestamp - (deltaTime % interval);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if(isGamePause) {
-      // only animate when game is paused
-    } else {
-      // only animate when game is **not** paused
-    }
     if (player1) {
       player1?.calculate();
       if(!isGamePause) player1?.update();
@@ -112,25 +107,25 @@ function animate(timestamp) {
     UpdateExplosions();
     randomClouds(ctx);
   }
-  requestAnimationFrame(animate);
+  animationId = requestAnimationFrame(animate);
 }
 //#endregion
 
-gameStartEvent.addHandler("start-initialize-js", () => {
-  console.log("start-initialize-js called")
+//#region GameEvents
+gameStartEvent.subscribe("start-initialize-game", () => {
   ENEMIES = [];
   EXPLOSIONS = [];
   deathRipple = null;
   player1 = new Player(
     width / 2 - 150, // x
     height / 2, // y
-    270, // starting angle
-    0.1, // lerpSteering
-    60, // maxSteeringAngle
-    3, // acceleration
-    ctx, // context
-    2.5, // steeringSpeed
-    1
+    270,     // starting angle
+    0.1,    // lerpSteering
+    60,    // maxSteeringAngle
+    3,    // acceleration
+    ctx,   // context
+    2.5,  // steeringSpeed
+    1    // controller
   );
   player2 = !isSolo
     ? new Player(
@@ -142,25 +137,31 @@ gameStartEvent.addHandler("start-initialize-js", () => {
         3, // acceleration
         ctx, // context
         2.5, // steeringSpeed
-        2,
+        2,   // controller
       )
     : null;
   spawnEnemyInterval = setInterval(() => {
-    console.log("spawnEnemyInterval called");
     AddEnemies();
   }, 5000);
+  animationId = requestAnimationFrame(animate);
 });
-requestAnimationFrame(animate);
-gameOverEvent.addHandler("pauseEnemy",() => {
-  if(spawnEnemyInterval)
+gameOverEvent.subscribe("over-pauseEnemy-stopAnimation",() => {
+  if(spawnEnemyInterval) {
     clearInterval(spawnEnemyInterval);
+    spawnEnemyInterval = null;
+  }
+  cancelAnimationFrame(animationId);
+  animationId=-1;
 });
-gamePauseEvent.addHandler("pause-enemy",() => {
-  if(spawnEnemyInterval)
+gamePauseEvent.subscribe("pause-pauseEnemy",() => {
+  if(spawnEnemyInterval) {
     clearInterval(spawnEnemyInterval);
+    spawnEnemyInterval = null;
+  }
 });
-gameResumeEvent.addHandler("resume-enemy", () => {
+gameResumeEvent.subscribe("resume-resumeEnemy", () => {
   spawnEnemyInterval = setInterval(() => {
     AddEnemies();
   }, 5000);
 });
+//#endregion
