@@ -153,14 +153,14 @@ export class Player extends Entity {
   decreaseLives() {
     this.lives -= 1;
     if (this.lives == 1 && audioManager) {
-      audioManager?.play(audios.lastHeart);
+      audioManager?.play(audios.lastHeart, { isStandalone: true });
     }
     if (this.controller == 1) UpdatePlayer1HartsUI(this.lives);
     else UpdatePlayer2HartsUI(this.lives);
     if (this.lives <= 0) {
       gameOverEvent.trigger();
       setRipple(this.x, this.y);
-      audioManager?.play("endgame");
+      audioManager?.play("endgame", { isStandalone: true });
     } else {
       addExplosion(this.x, this.y);
       audioManager?.play("hit");

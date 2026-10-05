@@ -24,29 +24,77 @@ export class AudioManager {
     });
 
     this.currentAudio = null;
+    this.activeSounds = [];
     this.mute = false;
+    this.masterVolume = 1;
   }
+  #randomKey(length = 8) {
+    return crypto.randomUUID().replaceAll("-", "").slice(0, length);
+  }
+  #removeFromActiveSounds(key){
+    this.activeSounds = this.activeSounds.filter(item => item.key !== key);
+  }
+  play(name, options = {}){
+    if(this.mute) return;
 
-  playReplacing(name) {
-    const source = this.sounds[name];
-    // if (!source || this.mute) return;
-    if (!source) return;
-
-    if (this.currentAudio && !this.currentAudio.paused) {
-      this.currentAudio.pause();
-      this.currentAudio.currentTime = 0;
+    const { loop =false, isStandalone= false } = options;
+    const original = this.sounds[name];
+    if(!original) { 
+      console.warn(`Invalid audio name passed - ${name} - ${Object.keys(this.sounds)}`);
+      return;
     }
+    if(isStandalone) {
+      console.log(isStandalone , this.activeSounds);
+      const oldStandalones = this.activeSounds.filter((item) => item.isStandalone === isStandalone);
+      oldStandalones.forEach((item) => {
+        const { audio } = item;
+        audio.pause();
+        audio.currentTime = 0;
+      });
+      this.activeSounds = this.activeSounds.filter((item) => item.isStandalone !== isStandalone);
+    }
+    const key = this.#randomKey();
+    const audio = original.cloneNode();
+    audio.loop = loop;
+    audio.volume = this.masterVolume;
 
-    const audio = source.cloneNode();
-    this.currentAudio = audio;
-    this.currentAudio.volume = this.mute ? 0 : 1;
+    const item = {key, name, audio, isStandalone};
+    this.activeSounds.push(item);
 
-    audio.play().catch((error) => {
-      console.warn("Audio playback failed:", error);
+    audio.play().catch(() => {
+      this.#removeFromActiveSounds(key);
     });
+    audio.addEventListener("ended",() => this.#removeFromActiveSounds(key));
+    return item;
   }
+
+  stopAudio({key, name} = {}) {
+    if(!key && !name) {
+      console.warn(`stopAudio() - key and name are not passed !`);
+      return;
+    }
+    const item = this.activeSounds.find(item => item.key === key);
+
+    if (!item) return;
+
+    const { audio } = item;
+
+    audio.pause();
+    audio.currentTime = 0;
+
+    this.#removeFromActiveSounds(key);
+  }
+  stopAllAudios() {
+    this.activeSounds.forEach((item) => {
+        const { key, audio } = item;
+        audio.pause();
+        audio.currentTime = 0;
+    });
+    this.activeSounds = [];
+  }
+
   // Controlled
-  play(name) {
+  _play(name) {
     const source = this.sounds[name];
     if (!source) return;
     if(!source.paused) {
@@ -58,50 +106,32 @@ export class AudioManager {
       console.error("Error playing ", name, "\n",error);
     });
   }
-  // uncontrolled - best for shooting
-  playAsync(name) {
-    const source = this.sounds[name];
-    // if (!source || this.mute) return;
-    if (!source) return;
 
-    // A fresh element lets this call finish independently of other calls.
-    const audio = source.cloneNode();
-    audio.volume = this.mute ? 0 : 1;
-
-    audio.play().catch((error) => {
-      console.warn("Audio playback failed:", error);
-    });
-  }
-  stop(name) {
-    // if(!this.sounds[name].pause) {
-      this.sounds[name].pause();
-      this.sounds[name].currentTime = 0;
-    // }
-  }
   muteAudio() {
-    this.mute = true;
-    if (this.currentAudio && !this.currentAudio.paused) {
-      this.currentAudio.volume = 0;
-    }
-    // Extras
-    Object.values(this.sounds).map((audio) =>audio.volume = 0)
+    console.log(this.activeSounds);
+    this.setMasterVolume(0);
+    console.log(`muteAudio(0)`);
   }
   unmuteAudio () {
-    this.mute = false;
-    if (this.currentAudio && !this.currentAudio.paused) {
-      this.currentAudio.volume = 1;
+    console.log(`unmuteAudio(1)`);
+    this.setMasterVolume(1);
+
+  }
+  setVolume(key, volume) {
+    const filterVolume = Math.max(0, Math.min(volume, 1));
+    const item = this.activeSounds.find(item => item.key === key);
+    if(!item) {
+      console.warn(`Invalid audio key passed - ${key}`);
+      return;
     }
-    // Extras
-    Object.values(this.sounds).map((audio) =>audio.volume = 0.5)
+    item.audio.volume = filterVolume;
   }
-  // muteBackground() { this.sounds.background.volume = 0;}
-  // unmuteBackground() { this.sounds.background.volume = 1;}
-  setVolume(name, volume) {
-    // this.sounds[name].volume = volume;
-    this.setArrtibute(name,"volume",volume);
-  }
-  setArrtibute(name, key,value) {
-    this.sounds[name][key] = value;
+  setMasterVolume(value) {
+    this.masterVolume = Math.max(0, Math.min(value, 1));
+    this.mute = this.masterVolume === 0 ? true : false;
+    this.activeSounds.forEach((item) => {
+      item.audio.volume = this.masterVolume;
+    });
   }
   get isMute() {return this.mute;}
 }

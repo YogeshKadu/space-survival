@@ -22,9 +22,6 @@ window.isGamePause = false;
 window.isGameOver = false;
 window.isSolo = false;
 window.audioManager = new AudioManager();
-// audioManager.play(audios.background);
-// audioManager.setVolume(audios.background, 0.5);
-// audioManager.setArrtibute(audios.background, "loop", true);
 const resizeCanvas = () => {
   window.width =  canvas.width = canvas.clientWidth * 1.5;
   window.height =  canvas.height = canvas.clientHeight * 1.5;
@@ -125,7 +122,7 @@ if(audioButton) {
 const mainMenuButton = document.getElementById("main-menu-button")
 if(mainMenuButton) {
   mainMenuButton.addEventListener("click", (event) => {
-    audioManager.setVolume(audios.background,0.5);
+    audioManager.stopAllAudios();
     gameOverEvent.trigger();
     startMenuElement.classList.remove("hidden");
     startMenuElement.classList.add("flex");
@@ -139,8 +136,7 @@ if(mainMenuButton) {
 
 //#region GameEvents
 gameStartEvent.subscribe("start-GameUI-and-settings",()=> {
-  // audioManager.stop(audios.background);
-  audioManager.setVolume(audios.background,0.2);
+  audioManager.setMasterVolume(0.2);
   startMenuElement.classList.add("hidden");
   if(gameSceneElement.classList.contains("hidden")) {
     gameSceneElement.classList.remove("hidden");
