@@ -153,7 +153,7 @@ export class Player extends Entity {
   decreaseLives() {
     this.lives -= 1;
     if (this.lives == 1 && audioManager) {
-      audioManager?.play(audios.lastHeart, { isStandalone: true });
+      audioManager?.play("lastHeart", { isStandalone: true });
     }
     if (this.controller == 1) UpdatePlayer1HartsUI(this.lives);
     else UpdatePlayer2HartsUI(this.lives);

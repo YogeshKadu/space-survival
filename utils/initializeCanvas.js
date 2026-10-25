@@ -136,7 +136,7 @@ if(mainMenuButton) {
 
 //#region GameEvents
 gameStartEvent.subscribe("start-GameUI-and-settings",()=> {
-  audioManager.setMasterVolume(0.2);
+  audioManager.stopAllAudios();
   startMenuElement.classList.add("hidden");
   if(gameSceneElement.classList.contains("hidden")) {
     gameSceneElement.classList.remove("hidden");

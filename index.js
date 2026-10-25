@@ -89,12 +89,12 @@ function animate(timestamp) {
     lastTime = timestamp - (deltaTime % interval);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (player1) {
-      player1?.calculate();
+      if(!isGamePause) player1?.calculate();
       if(!isGamePause) player1?.update();
       player1?.draw();
     }
     if (player2) {
-      player2?.calculate();
+      if(!isGamePause) player2?.calculate();
       if(!isGamePause) player2?.update();
       player2?.draw();
     }
